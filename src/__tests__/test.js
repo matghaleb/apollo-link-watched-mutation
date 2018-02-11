@@ -3,55 +3,98 @@ import {
   execute,
   Observable
 } from 'apollo-link';
-import {
-  APOLLO_QUERY_INIT,
-  APOLLO_QUERY_RESULT,
-  ReduxLink
-} from '../index';
+import { WatchedMutationLink } from '../index';
 import gql from 'graphql-tag';
-import { createStore } from 'redux';
 
 const sampleQuery = gql`
-    query SampleQuery {
-        stub {
+    query TodoList($status: String) {
+        todoList(status: $status) {
             id
+            name
+            status
         }
     }
 `;
 
-const store = createStore((state = {}, action) => {
-  switch (action.type) {
-    case APOLLO_QUERY_INIT:
-      return {
-        ...state,
-        init: {
-          operationName: action.operationName
+const sampleMutation = gql`
+    mutation SaveTodo(
+      $id: String
+      $status: String
+    ) {
+        saveTodo(
+          id: $id
+          status: $status
+        ) {
+            id
+            name
+            status
         }
-      };
-    case APOLLO_QUERY_RESULT:
-      return {
-        ...state,
-        result: {
-          operationName: action.operationName
-        }
-      };
-    default:
-      return state;
-  }
-});
+    }
+`;
 
-describe('ReduxLink', () => {
-  it('dispatches actions with operationName', done => {
-    const variables = { fooVariables: 'barVariables' };
-    const reduxLink = new ReduxLink(store);
-    const mockLink = new ApolloLink(operation => Observable.of({ fooData: 'barData' }));
-    const link = ApolloLink.from([
-      reduxLink,
-      mockLink
-    ]);
-    execute(link, { query: sampleQuery, variables }).subscribe(() => {
-      expect(store.getState().init.operationName).toBe('SampleQuery');
-      expect(store.getState().result.operationName).toBe('SampleQuery');
+const query = {
+  query: sampleQuery,
+  variables: { status: 'DONE' }
+};
+const mutation = {
+  query: sampleMutation,
+  variables: { id: 'todo_1', status: 'IN_PROGRESS' }
+};
+const cache = {
+  readQuery: k => {},
+  writeQuery: (k, v) => {}
+};
+
+describe('WatchedMutationLink', () => {
+  const watchedMutationLink = new WatchedMutationLink(cache, {
+    SaveTodo: {
+      TodoList: () => {}
+    }
+  });
+  const mockLink = new ApolloLink(operation => Observable.of({ fooData: 'barData' }));
+  const link = ApolloLink.from([
+    watchedMutationLink,
+    mockLink
+  ]);
+
+  it('should ignore unsuccessful queries', done => {
+    execute(link, query).subscribe(() => {
+      expect(false).toBe(true);
+      done();
+    });
+  });
+
+  it('should ignore successful but unrelated queries', done => {
+    execute(link, query).subscribe(() => {
+      expect(false).toBe(true);
+      done();
+    });
+  });
+
+  it('should add successful and related queries to queriesToUpdate', done => {
+    execute(link, query).subscribe(() => {
+      expect(false).toBe(true);
+      done();
+    });
+  });
+
+  it('should ignore unsuccessful mutations', done => {
+    execute(link, mutation).subscribe(() => {
+      expect(false).toBe(true);
+      done();
+    });
+  });
+
+  it('should ignore successful but unwatched mutations', done => {
+    execute(link, mutation).subscribe(() => {
+      expect(false).toBe(true);
+      done();
+    });
+  });
+
+  it('should invoke the provided callback if a cached query exists for a watched mutation', done => {
+    execute(link, query).subscribe(() => {
+      expect(false).toBe(true);
       done();
     });
   });

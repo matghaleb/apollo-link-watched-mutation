@@ -1,7 +1,7 @@
 {
-  "name": "apollo-link-redux",
-  "version": "0.2.1",
-  "description": "Dispatches apollo-client 1.0-ish actions.",
+  "name": "apollo-link-watched-mutation",
+  "version": "0.1.0",
+  "description": "An interface for providing default updates for mutation - query pairings",
   "keywords": [
     "apollo",
     "link",
@@ -10,14 +10,14 @@
   ],
   "license": "ISC",
   "author": {
-    "name": "Adam Yee",
-    "email": "adamjyee@gmail.com"
+    "name": "John Haytko",
+    "email": "johnhaytko@gmail.com"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AdamYee/apollo-link-redux.git"
+    "url": "git+https://github.com/haytko/apollo-link-watched-mutation.git"
   },
-  "bugs": "https://github.com/AdamYee/apollo-link-redux/issues",
+  "bugs": "https://github.com/haytko/apollo-link-watched-mutation/issues",
   "files": [
     "lib"
   ],
@@ -43,6 +43,7 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.32",
     "@babel/core": "^7.0.0-beta.32",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.39",
     "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.32",
     "@babel/plugin-transform-runtime": "^7.0.0-beta.32",
     "@babel/preset-env": "^7.0.0-beta.32",
@@ -52,7 +53,6 @@
     "graphql": "^0.11.0",
     "graphql-tag": "^2.6.1",
     "jest": "^22.1.4",
-    "redux": "^3.7.2",
     "regenerator-runtime": "^0.11.1",
     "rimraf": "^2.6.2"
   }
