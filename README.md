@@ -5,7 +5,7 @@ A Link interface for providing default cache updates to mutation - query relatio
 ### Background
 Easy [client-side caching](https://www.apollographql.com/docs/react/basics/caching.html) is one of the many reasons the [Apollo Client](https://www.apollographql.com/docs/react/) has gained so much popularity.
 
-One of the best features of the apollo-client is the idea of Watched Queries. Since the apollo-client handles your networking for you, it can inspect traffic and update its cache in-place if it ever sees an updated version of a cached value in a response.
+One of the best features of the apollo-client is the idea of automatic cache updates. Since the apollo-client handles your networking for you, it can inspect traffic and update its cache in-place if it ever sees an updated version of a cached value in a response.
 
 However, there are scenarios (e.g. item creation or filtered lists) where an in-place update may NOT be sufficient.
 
