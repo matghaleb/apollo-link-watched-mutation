@@ -106,19 +106,3 @@ const client = new ApolloClient({ link, cache });
 export default client;
 ```
 
-### Setup
-
-```bash
-npm i -S apollo-link-watched-mutation
-```
-
-(peer dependencies)
-```bash
-npm i -S apollo-link graphql
-```
-
-### Tests
-
-```bash
-npm test
-```
