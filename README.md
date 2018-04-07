@@ -1,6 +1,17 @@
 # apollo-link-watched-mutation
 A Link interface for providing default cache updates to mutation - query relationships
 
+### Setup
+
+```bash
+npm i -S apollo-link-redux
+```
+
+(peer dependencies)
+```bash
+npm i -S apollo-link graphql
+```
+
 ## Why does this package exist?
 ### Background
 Easy [client-side caching](https://www.apollographql.com/docs/react/basics/caching.html) is one of the many reasons the [Apollo Client](https://www.apollographql.com/docs/react/) has gained so much popularity.
@@ -104,5 +115,11 @@ const link = ApolloLink.from([
 ]);
 const client = new ApolloClient({ link, cache });
 export default client;
+```
+
+### Tests
+
+```bash
+npm test
 ```
 
