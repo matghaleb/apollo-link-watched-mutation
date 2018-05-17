@@ -4,7 +4,7 @@ A Link interface for providing default cache updates to mutation - query relatio
 ### Setup
 
 ```bash
-npm i -S apollo-link-redux
+npm i -S apollo-link-watched-mutation
 ```
 
 (peer dependencies)
