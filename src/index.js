@@ -6,8 +6,7 @@ import {
   isSuccessfulMutation,
   isFailedMutation,
   isOptimistic,
-  getQueryName,
-  getLinkArgs
+  getQueryName
 } from './utils';
 import { createCacheManager } from './cache-manager';
 import { createQueryKeyManager } from './queries-to-update-manager';
@@ -22,23 +21,16 @@ export class WatchedMutationLink extends ApolloLink {
    * @param debug - flag for debug logging, will log if truthy
    * @param readOnly - flag for telling this link never to write to the cache but otherwise operate as normal
    */
-  constructor(...args) {
-    super();
-    const {
-      cache,
-      mutationQueryResolverMap,
-      debug,
-      readOnly
-    } = getLinkArgs(...args);
-
+  constructor(cache, mutationQueryResolverMap, debug = 0, readOnly = 0) {
     assertPreconditions(cache, mutationQueryResolverMap);
+    super();
 
     this.cache = createCacheManager(cache, debug, readOnly);
     this.debug = debug;
     this.readOnly = readOnly;
     this.mutationManager = createMutationsManager(mutationQueryResolverMap);
-    this.queriesToUpdate = createQueryKeyManager();
-    this.inflightOptimisticRequests = createInflightRequestManager(this.cache);
+    this.queryManager = createQueryKeyManager();
+    this.inflightOptimisticRequests = createInflightRequestManager();
     this.debugLog({
       message: 'Success --- Constructed our link',
       watchedMutations: this.mutationManager.getMutationNames()
@@ -47,32 +39,34 @@ export class WatchedMutationLink extends ApolloLink {
 
   debugLog = payload => this.debug && window.console.log(payload);
   isQueryRelated = operationName => {
-    const registeredQueryNames = this.mutationManager.getAllQueryNamesToUpdate();
+    const registeredQueryNames = this.mutationManager.getAllRegisteredQueryNames();
     return registeredQueryNames.some(queryName => queryName === operationName || false);
   }
   addRelatedQuery = (queryName, operation) => {
-    this.queriesToUpdate.addQuery(queryName, this.cache.createKey(operation));
+    this.queryManager.addQuery(queryName, this.cache.createKey(operation));
   }
   removeRelatedQuery = (queryName, queryKey) => {
-    this.queriesToUpdate.removeQuery(queryName, queryKey);
+    this.queryManager.removeQuery(queryName, queryKey);
   }
   getCachedQueryKeysToUpdate = mutationName => {
     // gets all the unique Query + QueryVariable cache keys used by the apollo-cache
-    const relevantQueryNames = this.mutationManager.getQueryNamesToUpdate(mutationName);
-    return relevantQueryNames.reduce((queryCacheKeyList, queryName) => {
-      const relevantQueryCacheKeys = this.queriesToUpdate.getQueryKeysToUpdate(queryName);
+    const relevantQueryNames = this.mutationManager.getRegisteredQueryNames(mutationName);
+    const relevantQueryKeys = relevantQueryNames.reduce((queryCacheKeyList, queryName) => {
+      const relevantQueryCacheKeys = this.queryManager.getQueryKeysToUpdate(queryName);
       return [
         ...queryCacheKeyList,
         ...relevantQueryCacheKeys
       ];
     }, []);
+    return relevantQueryKeys;
   }
 
   updateQueryAfterMutation = (mutationOperation, mutationData, queryKey) => {
     const queryName = getQueryName(queryKey.query);
     const cachedQueryData = this.cache.read(queryKey);
     if (!cachedQueryData) {
-      // we failed reading from the cache so there's nothing to update, probably it was invalidated outside of this link, we should remove it from our queries to update
+      // we failed reading from the cache so there's nothing to update
+      // probably it was invalidated outside of this link, we should remove it from our queries to update
       this.removeRelatedQuery(queryName, queryKey);
       return;
     }
@@ -90,7 +84,7 @@ export class WatchedMutationLink extends ApolloLink {
         result: cachedQueryData
       }
     });
-    if (updatedData) {
+    if (updatedData !== null && updatedData !== undefined) {
       this.cache.write(queryKey, updatedData);
     } else {
       this.debugLog({
@@ -116,27 +110,30 @@ export class WatchedMutationLink extends ApolloLink {
       const currentCachedState = this.cache.read(queryKey);
       this.inflightOptimisticRequests.set(queryKey, currentCachedState);
       this.debugLog({
-        message: 'Added a cached query in case we need to revert it after an optimistic error',
+        message: 'Added a cached optimistic query in case we need to revert it after an optimistic error',
         mutationName: operationName
       });
     });
   }
-  clearOptimisticRequest = query => {
-    this.inflightOptimisticRequests.set(query, null);
+  clearOptimisticRequest = queryKey => {
+    this.inflightOptimisticRequests.set(queryKey, null);
+    this.debugLog({
+      message: 'Cleared a cached optimistic query'
+    });
   }
   revertOptimisticRequest = (operationName) => {
     const cachedQueryToUpdateKeys = this.getCachedQueryKeysToUpdate(operationName);
-    cachedQueryToUpdateKeys.forEach(query => {
-      const previousCachedState = this.inflightOptimisticRequests.get(query);
+    cachedQueryToUpdateKeys.forEach(queryKey => {
+      const previousCachedState = this.inflightOptimisticRequests.getBeforeState(queryKey);
       if (previousCachedState) {
-        this.cache.write(query, previousCachedState);
+        this.cache.write(queryKey, previousCachedState);
         this.debugLog({
           message: 'Reverted an optimistic request after an error',
           afterRevert: previousCachedState,
           mutationName: operationName
         });
       }
-      this.clearOptimisticRequest(operationName);
+      this.clearOptimisticRequest(queryKey);
     });
   }
 
@@ -145,6 +142,7 @@ export class WatchedMutationLink extends ApolloLink {
     const definition = getMainDefinition(operation.query);
     const operationName = (definition && definition.name && definition.name.value) || '';
     const context = operation.getContext();
+
     if (isOptimistic(context) && this.mutationManager.isWatched(operationName)) {
       this.addOptimisticRequest(operationName);
       this.updateQueriesAfterMutation(operation, operationName, context.optimisticResponse);
@@ -163,7 +161,11 @@ export class WatchedMutationLink extends ApolloLink {
           // for every successful mutation, look up the cachedQueryKeys the mutation cares about, and invoke the update callback for each one
           this.updateQueriesAfterMutation(operation, operationName, result);
         }
-      } else if (isFailedMutation(definition.operation, result) && this.mutationManager.isWatched(operationName)) {
+      } else if (
+        isFailedMutation(definition.operation, result) &&
+        this.mutationManager.isWatched(operationName) &&
+        isOptimistic(context)
+      ) {
         this.revertOptimisticRequest(operationName);
       }
       return result;

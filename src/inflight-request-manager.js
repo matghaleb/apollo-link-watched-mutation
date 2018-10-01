@@ -4,7 +4,7 @@ export const createInflightRequestManager = () => {
   const inflightRequests = {};
 
   return {
-    get: queryKey => inflightRequests[JSON.stringify(queryKey)],
+    getBeforeState: queryKey => inflightRequests[JSON.stringify(queryKey)],
     set: (queryKey, result) => {
       inflightRequests[JSON.stringify(queryKey)] = result;
     }

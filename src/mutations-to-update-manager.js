@@ -2,12 +2,13 @@ export const createMutationsManager = mutationQueryResolverMap => {
   // used to look up mutations to watch, what queries each mutation is related to, and what callbacks to call for each query
 
   const getMutationNames = () => Object.keys(mutationQueryResolverMap);
-  const getQueryNamesToUpdate = mutationName => {
+  const getRegisteredQueryNames = mutationName => {
     return Object.keys(mutationQueryResolverMap[mutationName] || {})
   };
-  const getAllQueryNamesToUpdate = () => {
+  const getAllRegisteredQueryNames = () => {
+    // across all watched mutations
     return getMutationNames().reduce((queryNames, mutationName) => {
-      queryNames.push(...getQueryNamesToUpdate(mutationName));
+      queryNames.push(...getRegisteredQueryNames(mutationName));
       return queryNames;
     }, []);
   };
@@ -15,8 +16,8 @@ export const createMutationsManager = mutationQueryResolverMap => {
   return {
     isWatched: mutationName => mutationQueryResolverMap.hasOwnProperty(mutationName),
     getMutationNames,
-    getQueryNamesToUpdate,
-    getAllQueryNamesToUpdate,
+    getRegisteredQueryNames,
+    getAllRegisteredQueryNames,
     getUpdateFn: (mutationName, queryName) => mutationQueryResolverMap[mutationName][queryName] || (() => {})
   };
 };

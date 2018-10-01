@@ -28,11 +28,16 @@ export const createCacheManager = (cache, debug, readOnly) => {
       try {
         cache.writeQuery({ ...query, data });
         if (debug) {
-          window.console.log({
-            message: 'Success --- Updated the cache upon a mutation',
-            cacheKey: query,
-            data
-          });
+          const writtenData = cache.readQuery(query);
+          if (JSON.stringify(data) === JSON.stringify(writtenData)) {
+            window.console.log({
+              message: 'Success --- Updated the cache upon a mutation',
+              cacheKey: query,
+              data
+            });
+          } else {
+            throw new Error('Unable to write to the cache');
+          }
         }
       } catch (error) {
         if (debug) {

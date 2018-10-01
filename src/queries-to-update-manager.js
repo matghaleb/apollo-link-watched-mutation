@@ -12,7 +12,7 @@ export const createQueryKeyManager = () => {
     removeQuery: (queryName, queryKey) => {
       queriesToUpdate[queryName] = getQueryKeysToUpdate(queryName).filter(key => JSON.stringify(key) !== JSON.stringify(queryKey));
     },
-    hasQueryToUpdate: queryName => queriesToUpdate.hasOwnProperty(queryName),
+    hasQueryToUpdate: queryName => getQueryKeysToUpdate(queryName).length > 0,
     getQueryKeysToUpdate
   };
 }

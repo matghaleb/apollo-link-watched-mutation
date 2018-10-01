@@ -26,10 +26,10 @@ describe('WatchedMutationLink', () => {
       watchedMutationLink,
       mockLink
     ]);
-    expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+    expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
 
     execute(link, query).subscribe(() => {
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
       expect(called).toBe(false);
       done();
     });
@@ -47,7 +47,7 @@ describe('WatchedMutationLink', () => {
       watchedMutationLink,
       mockLink
     ]);
-    expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+    expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
     const usersQuery = gql`
         query Users {
           id
@@ -56,13 +56,13 @@ describe('WatchedMutationLink', () => {
     `;
 
     execute(link, { query: usersQuery }).subscribe(() => {
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
       expect(called).toBe(false);
       done();
     });
   });
 
-  it('should add successful and related queries to queriesToUpdate', done => {
+  it('should add successful and related queries to queryManager', done => {
     let called = false;
     const watchedMutationLink = new WatchedMutationLink(cache, {
       SaveTodo: { TodoList: () => { called = true; } }
@@ -72,11 +72,11 @@ describe('WatchedMutationLink', () => {
       watchedMutationLink,
       mockLink
     ]);
-    expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+    expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
 
     execute(link, query).subscribe(() => {
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(true);
-      const todoListQueriesToUpdate = watchedMutationLink.queriesToUpdate.getQueryKeysToUpdate('TodoList');
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(true);
+      const todoListQueriesToUpdate = watchedMutationLink.queryManager.getQueryKeysToUpdate('TodoList');
       expect(todoListQueriesToUpdate.length).toBe(1);
       expect(todoListQueriesToUpdate[0].variables).toMatchObject({ status: 'DONE' });
       expect(called).toBe(false);
@@ -96,11 +96,11 @@ describe('WatchedMutationLink', () => {
       mockQueryLink
     ]);
 
-    expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+    expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
 
     execute(queryLink, query).subscribe(() => {
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(true);
-      const todoListQueriesToUpdate = watchedMutationLink.queriesToUpdate.getQueryKeysToUpdate('TodoList');
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(true);
+      const todoListQueriesToUpdate = watchedMutationLink.queryManager.getQueryKeysToUpdate('TodoList');
       expect(todoListQueriesToUpdate.length).toBe(1);
       expect(todoListQueriesToUpdate[0].variables).toMatchObject({ status: 'DONE' });
       expect(called).toBe(false);
@@ -136,11 +136,11 @@ describe('WatchedMutationLink', () => {
       mockQueryLink
     ]);
 
-    expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+    expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
 
     execute(queryLink, query).subscribe(() => {
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(true);
-      const todoListQueriesToUpdate = watchedMutationLink.queriesToUpdate['TodoList'];
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(true);
+      const todoListQueriesToUpdate = watchedMutationLink.queryManager.getQueryKeysToUpdate('TodoList');
       expect(todoListQueriesToUpdate.length).toBe(1);
       expect(todoListQueriesToUpdate[0].variables).toMatchObject({ status: 'DONE' });
       expect(called).toBe(false);
@@ -203,11 +203,11 @@ describe('WatchedMutationLink', () => {
       mockQueryLink
     ]);
 
-    expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+    expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
 
     execute(queryLink, query).subscribe(() => {
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(true);
-      const todoListQueriesToUpdate = watchedMutationLink.queriesToUpdate['TodoList'];
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(true);
+      const todoListQueriesToUpdate = watchedMutationLink.queryManager.getQueryKeysToUpdate('TodoList');
       expect(todoListQueriesToUpdate.length).toBe(1);
       expect(todoListQueriesToUpdate[0].variables).toMatchObject({ status: 'DONE' });
       expect(called).toBe(false);
@@ -243,11 +243,11 @@ describe('WatchedMutationLink', () => {
         mockQueryLink
       ]);
 
-      expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(false);
+      expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(false);
 
       execute(queryLink, query).subscribe(() => {
-        expect(watchedMutationLink.queriesToUpdate.hasQueryToUpdate('TodoList')).toBe(true);
-        const todoListQueriesToUpdate = watchedMutationLink.queriesToUpdate['TodoList'];
+        expect(watchedMutationLink.queryManager.hasQueryToUpdate('TodoList')).toBe(true);
+        const todoListQueriesToUpdate = watchedMutationLink.queryManager.getQueryKeysToUpdate('TodoList');
         expect(todoListQueriesToUpdate.length).toBe(1);
         expect(todoListQueriesToUpdate[0].variables).toMatchObject({ status: 'DONE' });
         expect(called).toBe(false);
