@@ -1,0 +1,70 @@
+import gql from 'graphql-tag';
+
+export const sampleQuery = gql`
+    query TodoList($status: String) {
+        todoList(status: $status) {
+            id
+            name
+            status
+        }
+    }
+`;
+
+export const sampleSuccessfulQueryResponse = {
+  data: {
+    todoList: [
+      { id: '1', name: 'Get groceries', status: 'IN_PROGRESS' },
+      { id: '2', name: 'Take car in for service', status: 'DONE' }
+    ]
+  }
+};
+
+export const sampleErrorQueryResponse = {
+  data: null,
+  errors: [{ message: 'Everything went wrong' }]
+};
+
+export const sampleMutation = gql`
+    mutation SaveTodo(
+      $id: String
+      $status: String
+    ) {
+        saveTodo(
+          id: $id
+          status: $status
+        ) {
+            id
+            name
+            status
+        }
+    }
+`;
+
+export const sampleSuccessfulMutationResponse = {
+  data: {
+    saveTodo: {
+      id: '1',
+      name: 'Get groceries',
+      status: 'DONE'
+    }
+  }
+};
+
+export const sampleErrorMutationResponse = {
+  data: null,
+  errors: [{ message: 'Oops forgot to implement' }]
+};
+
+
+export const query = {
+  query: sampleQuery,
+  variables: { status: 'DONE' }
+};
+export const mutation = {
+  query: sampleMutation,
+  variables: { id: 'todo_1', status: 'IN_PROGRESS' }
+};
+export const cache = {
+  readQuery: k => {},
+  writeQuery: (k, v) => {}
+};
