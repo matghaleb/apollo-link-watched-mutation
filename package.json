@@ -1,6 +1,6 @@
 {
   "name": "apollo-link-watched-mutation",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "An interface for providing default updates for mutation - query pairings",
   "keywords": [
     "apollo",

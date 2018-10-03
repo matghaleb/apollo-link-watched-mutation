@@ -145,7 +145,7 @@ export class WatchedMutationLink extends ApolloLink {
 
     if (isOptimistic(context) && this.mutationManager.isWatched(operationName)) {
       this.addOptimisticRequest(operationName);
-      this.updateQueriesAfterMutation(operation, operationName, context.optimisticResponse);
+      this.updateQueriesAfterMutation(operation, operationName, { data: context.optimisticResponse });
     }
 
     return observer.map(result => {

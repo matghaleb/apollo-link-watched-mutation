@@ -194,7 +194,11 @@ describe('WatchedMutationLink', () => {
   it('should invoke the provided callback if a cached query exists for a watched mutation', done => {
     let called = false;
     const watchedMutationLink = new WatchedMutationLink(cache, {
-      SaveTodo: { TodoList: () => { called = true; } }
+      SaveTodo: {
+        TodoList: ({ mutation, query }) => {
+          called = true;
+        }
+      }
     });
     const mockQueryLink = new ApolloLink(() => Observable.of(sampleSuccessfulQueryResponse));
     const mockMutationLink = new ApolloLink(() => Observable.of(sampleSuccessfulMutationResponse));
@@ -232,10 +236,16 @@ describe('WatchedMutationLink', () => {
 
 
   describe('optimistic', () => {
-    it('should invoke the provided callback if a cached query exist for a watched mutation and an optimistic response is sent', done => {
+    it('should invoke the provided callback with data if a cached query exist for a watched mutation and an optimistic response is sent', done => {
       let called = false;
       const watchedMutationLink = new WatchedMutationLink(cache, {
-        SaveTodo: { TodoList: () => { called = true; } }
+        SaveTodo: {
+          TodoList: ({ mutation, query }) => {
+            if (mutation.result.hasOwnProperty('data')) {
+              called = true;
+            }
+          }
+        }
       });
       const mockQueryLink = new ApolloLink(() => Observable.of(sampleSuccessfulQueryResponse));
       const queryLink = ApolloLink.from([
