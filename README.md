@@ -1,4 +1,4 @@
-# apollo-link-watched-mutation
+# apollo-link-watched-mutation ![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)
 A Link interface for providing default cache updates based on { mutation : query } relationships
 
 ### Setup
