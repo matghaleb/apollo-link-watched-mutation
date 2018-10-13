@@ -99,17 +99,25 @@ const link = ApolloLink.from([
         const isTodoIncluded = cachedTodos.some(todos => todos.id === mutatedTodoId);
         const shouldTodoBeIncluded = !query.variables || !query.variables.status || query.variables.status.includes(updatedTodo.status);
 
-        const updatedResult = query.result;
+        let updatedItems = null;
         if (isTodoIncluded && !shouldTodoBeIncluded) {
           // if the mutatedTodo is found in the cached list and it should not be there after the mutation, remove it
-          updatedResult.todos.items = cachedTodos.filter(todo => todo.id !== mutatedTodoId);
-          return updatedResult;
+          updatedItems = cachedTodos.filter(todo => todo.id !== mutatedTodoId);
         } else if (!isTodoIncluded && shouldTodoBeIncluded) {
           // if the mutatedTodo is not found in the cached list and it should be there after the mutation, add it
-          updatedResult.todos.items = [updatedTodo, ...cachedTodos];
-          return updatedResult;
+          updatedItems = [updatedTodo, ...cachedTodos];
         }
         // else an in-place update is already sufficient so no update is necessary
+        if (updatedItems) {
+          // return query.result with immutable items
+          return {
+            ...query.result,
+            todos: {
+              ...query.result.todos,
+              items: updatedItems,
+            },
+          };
+        }
       }
     }
   }),
