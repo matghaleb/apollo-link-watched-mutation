@@ -109,7 +109,7 @@ const link = ApolloLink.from([
         }
         // else an in-place update is already sufficient so no update is necessary
         if (updatedItems) {
-          // return query.result with immutable items
+          // immutably return query.result with updated items
           return {
             ...query.result,
             todos: {
