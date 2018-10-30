@@ -18,6 +18,12 @@ Notes:
 ```
 npm i
 ```
+```
+cd server && npm i
+```
+```
+cd app && npm i
+```
 
 ### Running
 ```
