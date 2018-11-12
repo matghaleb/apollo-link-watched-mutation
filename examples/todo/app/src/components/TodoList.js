@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Query } from 'react-apollo';
 import PropTypes from 'prop-types';
 import { Todo } from './Todo';
@@ -18,11 +18,16 @@ export const TodoList = props => {
           }
 
           return (
-            <ul>
-              {queryProps.data.todos.map(todo => (
-                <Todo key={`${props.filter}-${todo.id}`} {...todo} />
-              ))}
-            </ul>
+            <div>
+              <ul>
+                {queryProps.data.todos.map(todo => (
+                  <Todo key={`${props.filter}-${todo.id}`} {...todo} />
+                ))}
+              </ul>
+              <button onClick={() => queryProps.refetch()}>
+                refetch
+              </button>
+            </div>
           );
         }}
       </Query>
