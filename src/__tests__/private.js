@@ -64,7 +64,19 @@ export const mutation = {
   query: sampleMutation,
   variables: { id: 'todo_1', status: 'IN_PROGRESS' }
 };
-export const cache = {
-  readQuery: k => {},
-  writeQuery: (k, v) => {}
+export const createCache = () => {
+  const data = {};
+
+  const cache = {
+    readQuery: k => data[k],
+    writeQuery: (k, v,) => {
+      data[k] = v;
+    }
+  };
+  return {
+    ...cache,
+    performTransaction: writeFn => {
+      writeFn(cache);
+    }
+  };
 };

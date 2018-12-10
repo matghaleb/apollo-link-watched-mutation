@@ -1,5 +1,6 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { port } = require('./package');
+const { sleep } = require('./utils');
 
 let todos = [
   {
@@ -22,6 +23,7 @@ const typeDefs = gql`
   type Mutation {
     addTodo(text: String!): Todo
     toggleTodo(id: Int!): Todo
+    toggleTodoWithError(id: Int!): Todo
   }
 
   type Query {
@@ -42,7 +44,8 @@ const getVisibleTodos = (todos, filter) => {
 
 const resolvers = {
   Query: {
-    todos: (_, args) => {
+    todos: async (_, args) => {
+      await sleep();
       const allTodos = todos.map((todo, idx) => ({
         id: idx,
         ...todo
@@ -51,18 +54,24 @@ const resolvers = {
     },
   },
   Mutation: {
-    addTodo: (_, args) => {
+    addTodo: async (_, args) => {
+      await sleep();
       const newTodo = { id: todos.length, text: args.text, completed: false };
       todos = [...todos, newTodo];
       return newTodo;
     },
-    toggleTodo: (_, args) => {
+    toggleTodo: async (_, args) => {
+      await sleep();
       const todoToToggle = todos[args.id];
       todoToToggle.completed = !todoToToggle.completed;
       return {
         id: args.id,
         ...todoToToggle
       };
+    },
+    toggleTodoWithError: async () => {
+      await sleep();
+      throw new Error('Error reporting for duty.');
     }
   }
 };

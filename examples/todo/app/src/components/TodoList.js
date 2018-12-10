@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { Query } from 'react-apollo';
 import PropTypes from 'prop-types';
 import { Todo } from './Todo';
