@@ -10,10 +10,11 @@ import {
   sampleErrorQueryResponse,
   sampleSuccessfulMutationResponse,
   sampleErrorMutationResponse,
-  cache,
+  createCache,
   mutation,
   query
 } from './private';
+const cache = createCache();
 
 describe('WatchedMutationLink', () => {
   it('should ignore unsuccessful queries', done => {
@@ -266,7 +267,7 @@ describe('WatchedMutationLink', () => {
       // mock what should be stored in apollo's cache after a successful query
       watchedMutationLink.cache.read = cacheKey => {
         if (JSON.stringify(cacheKey) === JSON.stringify(query)) {
-          return sampleErrorQueryResponse;
+          return sampleSuccessfulQueryResponse;
         }
       }
       const mutationLink = ApolloLink.from([

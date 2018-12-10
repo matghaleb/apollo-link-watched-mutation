@@ -65,6 +65,18 @@ const link = new ApolloLink.from([
           return { ...query.result, todos: updatedTodos };
         }
       }
+    },
+    ToggleTodoWithError: {
+      GetTodos: ({ mutation, query }) => {
+        const updatedTodo = mutation.result.data.toggleTodoWithError;
+        const cachedTodos = query.result.todos;
+        const updatedTodos = applyFiltering(updatedTodo, cachedTodos, query);
+
+        if (updatedTodos) {
+          // immutably return query.result with updated items
+          return { ...query.result, todos: updatedTodos };
+        }
+      }
     }
   }, 1),
   new BatchHttpLink({ uri: `http://localhost:4000/graphql` })

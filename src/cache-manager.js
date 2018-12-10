@@ -1,6 +1,13 @@
 export const createCacheManager = (cache, debug, readOnly) => {
   return {
     createKey: operation => ({ query: operation.query, variables: operation.variables }),
+    performTransaction: writeFn => {
+      if (cache.performTransaction) {
+        return cache.performTransaction(writeFn);
+      } else {
+        return writeFn(cache);
+      }
+    },
     read: query => {
       try {
         return cache.readQuery(query);

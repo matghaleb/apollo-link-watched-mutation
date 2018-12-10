@@ -20,6 +20,16 @@ export const TOGGLE_TODO = gql`
   }
 `;
 
+export const TOGGLE_TODO_WITH_ERROR = gql`
+  mutation ToggleTodoWithError($id: Int!) {
+    toggleTodoWithError(id: $id) {
+      id
+      text
+      completed
+    }
+  }
+`;
+
 export const ADD_TODO = gql`
   mutation AddTodo($text: String!) {
     addTodo(text: $text) {

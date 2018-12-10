@@ -61,7 +61,7 @@ export class WatchedMutationLink extends ApolloLink {
     return relevantQueryKeys;
   }
 
-  updateQueryAfterMutation = (mutationOperation, mutationData, queryKey) => {
+  getUpdateAfterMutation = (mutationOperation, mutationData, queryKey) => {
     const queryName = getQueryName(queryKey.query);
     const cachedQueryData = this.cache.read(queryKey);
     if (!cachedQueryData) {
@@ -85,22 +85,29 @@ export class WatchedMutationLink extends ApolloLink {
       }
     });
     if (updatedData !== null && updatedData !== undefined) {
-      this.cache.write(queryKey, updatedData);
-    } else {
-      this.debugLog({
-        message: 'We did NOT receive anything new to write to the cache so we will not do anything',
-        cacheKey: queryKey
-      });
+      return { queryKey, updatedData };
     }
   }
   updateQueriesAfterMutation = (operation, operationName, result) => {
     const cachedQueryToUpdateKeys = this.getCachedQueryKeysToUpdate(operationName);
-    cachedQueryToUpdateKeys.forEach(queryKey => {
+    const itemsToWrite = cachedQueryToUpdateKeys.reduce((items, queryKey) => {
       this.debugLog({
         message: 'Found a cached query related to this successful mutation, this Link will invoke the associated callback',
         mutationName: operationName
       });
-      this.updateQueryAfterMutation(operation, result, queryKey);
+      const resultToWrite = this.getUpdateAfterMutation(operation, result, queryKey);
+      if (resultToWrite) {
+        items.push(resultToWrite);
+      } else {
+        this.debugLog({
+          message: 'We did NOT receive anything new to write to the cache so we will not do anything',
+          cacheKey: queryKey
+        });
+      }
+      return items;
+    }, []);
+    this.cache.performTransaction(() => {
+      itemsToWrite.forEach(data => this.cache.write(data.queryKey, data.updatedData));
     });
   }
 
@@ -117,9 +124,7 @@ export class WatchedMutationLink extends ApolloLink {
   }
   clearOptimisticRequest = queryKey => {
     this.inflightOptimisticRequests.set(queryKey, null);
-    this.debugLog({
-      message: 'Cleared a cached optimistic query'
-    });
+    this.debugLog({ message: 'Cleared a cached optimistic query' });
   }
   revertOptimisticRequest = (operationName) => {
     const cachedQueryToUpdateKeys = this.getCachedQueryKeysToUpdate(operationName);
