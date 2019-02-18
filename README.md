@@ -47,7 +47,7 @@ With [Apollo-Client 2.0](https://dev-blog.apollodata.com/apollo-client-2-0-5c8d0
 new WatchedMutationLink(
   cache, // whatever is passed to the apollo-client
   {
-    saveTodo: {
+    SaveTodo: {
       TodoList: ({ mutation, query }) => { /* */ }
     }
   }
@@ -91,7 +91,7 @@ import WatchedMutationLink from 'apollo-link-watched-mutation';
 const cache = new InMemoryCache();
 const link = ApolloLink.from([
   new WatchedMutationLink(cache, {
-    saveTodo: {
+    SaveTodo: {
       TodoList: ({ mutation, query }) => {
         const mutatedTodoId = mutation.variables.id;
         const updatedTodo = mutation.result.data.saveTodo;
