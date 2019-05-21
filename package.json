@@ -1,6 +1,6 @@
 {
   "name": "apollo-link-watched-mutation",
-  "version": "0.2.4",
+  "version": "0.3.2",
   "description": "An interface for providing default updates for mutation - query pairings",
   "keywords": [
     "apollo",
@@ -29,19 +29,20 @@
     "build:main": "babel src -d lib/main --config-file ./babel.main.json",
     "build:module": "babel src -d lib/module --config-file ./babel.module.json",
     "build": "npm run build:main && npm run build:module",
-    "prepublishOnly": "npm test && npm run clean && npm run build",
+    "prepare": "npm test && npm run clean && npm run build",
     "test": "jest"
   },
   "jest": {
-    "testRegex": "(/__tests__/.*(test))\\.js$"
+    "testRegex": "(/__tests__/.*(test))\\.js$",
+    "testURL": "http://localhost/"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.32",
-    "apollo-utilities": "^1.0.0"
+    "apollo-utilities": "^1.2.8"
   },
   "peerDependencies": {
     "apollo-link": "^1.0.0",
-    "graphql": "^0.11.0"
+    "graphql": "^0.13.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.32",

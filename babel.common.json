@@ -1,13 +1,10 @@
 {
   "comments": false,
-  "ignore": [
-    "**/__tests__/*"
-  ],
+  "ignore": ["**/__tests__/*"],
   "plugins": [
     [
       "@babel/plugin-transform-runtime",
       {
-        "polyfill": false,
         "regenerator": false
       }
     ]
