@@ -37,7 +37,7 @@
     "testURL": "http://localhost/"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.32",
+    "@babel/runtime": "^7.5.0",
     "apollo-utilities": "^1.2.8"
   },
   "peerDependencies": {
@@ -45,12 +45,12 @@
     "graphql": "^0.13.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.0.0-beta.32",
-    "@babel/core": "^7.0.0-beta.32",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.39",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.32",
-    "@babel/plugin-transform-runtime": "^7.0.0-beta.32",
-    "@babel/preset-env": "^7.0.0-beta.32",
+    "@babel/cli": "^7.5.0",
+    "@babel/core": "^7.5.0",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.5.0",
+    "@babel/plugin-transform-runtime": "^7.5.0",
+    "@babel/preset-env": "^7.5.0",
     "apollo-link": "^1.0.0",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^22.1.0",
